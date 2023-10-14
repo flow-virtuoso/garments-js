@@ -343,23 +343,14 @@ document.addEventListener('DOMContentLoaded', function () {
 const accordionItemIsOpen = [true, true, true, true];
 
 // Initializing an array for accordion content
-const accordionContent = [
-  document.getElementById('accordion-content-1'),
-  document.getElementById('accordion-content-2'),
-  document.getElementById('accordion-content-3'),
-  document.getElementById('accordion-content-4'),
-];
+const accordionContent = document.querySelectorAll('[accordion-content]');
+
+// Initializing an array for accordion items
+const accordionItem = document.querySelectorAll('[accordion-item]');
 
 // Ensuring the default state for all accordion items
 for (const item of accordionContent) {
   item.style.transform = 'translateY(0px)';
-}
-
-// Initializing an array for accordion content heights
-const accordionContentHeight = [];
-
-for (const item of accordionContent) {
-  accordionContentHeight.push(item.offsetHeight);
 }
 
 // Function to toggle the state of an accordion item based on its index
@@ -369,11 +360,23 @@ function accordionButtonClick(accordionItemNumber) {
 
   // Check if the accordion item is open
   if (accordionItemIsOpen[itemIndex]) {
-    accordionContent[itemIndex].style.transform = `translateY(${-accordionContentHeight[
-      itemIndex
-    ]}px)`;
+    // accordionContent[itemIndex].style.transform = `translateY(${-accordionContent[itemIndex]
+    //   .offsetHeight}px)`;
+    accordionContent[itemIndex].style.maxHeight = '0px';
+
+    //accordionItem.forEach((item, index) => {
+    //if (index > itemIndex) {
+    // item.style.transform = `translateY(${-accordionContent[itemIndex].offsetHeight}px)`;
+    //}
+    //});
   } else {
-    accordionContent[itemIndex].style.transform = 'translateY(0px)';
+    accordionContent[itemIndex].style.maxHeight = '1000px';
+    // accordionContent[itemIndex].style.transform = 'translateY(0px)';
+    //accordionItem.forEach((item, index) => {
+    // if (index > itemIndex) {
+    // item.style.transform = 'translateY(0px)';
+    // }
+    //});
   }
 
   // Toggle the state of the accordion item
@@ -388,3 +391,5 @@ accordionButtons.forEach((button, index) => {
     accordionButtonClick(index + 1);
   });
 });
+
+// the maxHeight thing works functionally but doesn't animate properly.
