@@ -2,8 +2,6 @@ import { greetUser } from '$utils/greet';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
-  const name = 'John Doe';
+  const name = 'John Dope';
   greetUser(name);
 });
-
-//comment
