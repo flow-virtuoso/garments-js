@@ -340,47 +340,93 @@ document.addEventListener('DOMContentLoaded', function () {
 //  ------------------------
 
 // Initializing an array to store the open/close state of each accordion item
-const accordionItemIsOpen = [true, true, true, true];
+let accordionItemIsOpen = [false, true, true, true];
 
 // Initializing an array for accordion content
 const accordionContent = document.querySelectorAll('[accordion-content]');
+const accordionArrow = document.querySelectorAll('[accordion-arrow]');
 
-// Initializing an array for accordion items
-const accordionItem = document.querySelectorAll('[accordion-item]');
+// Take a snapshot of the height of each accordion content
+let contentHeight = [];
+let contentPaddingTop = [];
+let contentPaddingBottom = [];
 
-// Ensuring the default state for all accordion items
-for (const item of accordionContent) {
-  item.style.transform = 'translateY(0px)';
+function updateMeasurementArrays() {
+  contentHeight = [];
+  contentPaddingTop = [];
+  contentPaddingBottom = [];
+
+  accordionContent.forEach((element) => {
+    let height = element.offsetHeight;
+    let computedStyle = getComputedStyle(element);
+    let elementPaddingTop = parseFloat(computedStyle.paddingTop);
+    let elementPaddingBottom = parseFloat(computedStyle.paddingBottom);
+    contentHeight.push(height);
+    contentPaddingTop.push(elementPaddingTop);
+    contentPaddingBottom.push(elementPaddingBottom);
+  });
+
+  console.log(contentHeight);
+  console.log(contentPaddingTop);
+  console.log(contentPaddingBottom);
 }
+
+//initial snapshot of measurements
+updateMeasurementArrays();
+
+let resizeTimer;
+let isResizing = false;
+
+function handleResize() {
+  if (isResizing) {
+    clearTimeout(resizeTimer);
+  } else {
+    isResizing = true;
+  }
+
+  resizeTimer = setTimeout(() => {
+    isResizing = false;
+    updateMeasurementArrays();
+  }, 1000); // Adjust the debounce time as needed
+}
+
+window.addEventListener('resize', handleResize);
 
 // Function to toggle the state of an accordion item based on its index
 function accordionButtonClick(accordionItemNumber) {
   // Get the index for the accordion item (0-based)
   const itemIndex = accordionItemNumber - 1;
 
-  // Check if the accordion item is open
-  if (accordionItemIsOpen[itemIndex]) {
-    // accordionContent[itemIndex].style.transform = `translateY(${-accordionContent[itemIndex]
-    //   .offsetHeight}px)`;
-    accordionContent[itemIndex].style.maxHeight = '0px';
-
-    //accordionItem.forEach((item, index) => {
-    //if (index > itemIndex) {
-    // item.style.transform = `translateY(${-accordionContent[itemIndex].offsetHeight}px)`;
-    //}
-    //});
-  } else {
-    accordionContent[itemIndex].style.maxHeight = '1000px';
-    // accordionContent[itemIndex].style.transform = 'translateY(0px)';
-    //accordionItem.forEach((item, index) => {
-    // if (index > itemIndex) {
-    // item.style.transform = 'translateY(0px)';
-    // }
-    //});
-  }
-
-  // Toggle the state of the accordion item
-  accordionItemIsOpen[itemIndex] = !accordionItemIsOpen[itemIndex];
+  // Iterate through all accordion items
+  accordionItemIsOpen.forEach((isOpen, index) => {
+    if (index === itemIndex) {
+      // if its the accordion item you clicked
+      if (accordionItemIsOpen[itemIndex]) {
+        // and its open, then close it
+        accordionContent[itemIndex].style.maxHeight = '0px';
+        accordionContent[itemIndex].style.paddingTop = '0px';
+        accordionContent[itemIndex].style.paddingBottom = '0px';
+        accordionArrow[itemIndex].style.transform = 'rotateZ(0deg)';
+        accordionItemIsOpen[itemIndex] = !accordionItemIsOpen[itemIndex];
+      } else {
+        // and its closed, then open it
+        accordionContent[itemIndex].style.maxHeight = contentHeight[itemIndex] + 'px';
+        accordionContent[itemIndex].style.paddingTop = contentPaddingTop[itemIndex] + 'px';
+        accordionContent[itemIndex].style.paddingBottom = contentPaddingBottom[itemIndex] + 'px';
+        accordionArrow[itemIndex].style.transform = 'rotateZ(180deg)';
+        accordionItemIsOpen[itemIndex] = !accordionItemIsOpen[itemIndex];
+      }
+    } else if (isOpen) {
+      // if its not the accordion item you clicked
+      accordionContent[index].style.maxHeight = '0px';
+      accordionContent[index].style.paddingTop = '0px';
+      accordionContent[index].style.paddingBottom = '0px';
+      accordionArrow[index].style.transform = 'rotateZ(0deg)';
+      accordionItemIsOpen[index] = false;
+    }
+  });
+  // check the status of which items are open
+  console.log(accordionItemIsOpen);
 }
 
 // Adding event listeners to buttons
@@ -392,4 +438,5 @@ accordionButtons.forEach((button, index) => {
   });
 });
 
-// the maxHeight thing works functionally but doesn't animate properly.
+// Closing the accordion items when the page loads
+accordionButtonClick(1);
