@@ -2,154 +2,142 @@
 //   Sliders
 //  ---------
 
-// Array of slider cards in the DOM
-const sliderCards = Array.from(document.querySelectorAll('[slider="card"]'));
-const slider = document.querySelector('[slider="wrapper"]');
+function Slider(
+  sliderWrapperSelector,
+  cardSelector,
+  leftButtonSelector = null,
+  rightButtonSelector = null,
+  swipeAreaSelector = null,
+  dotSelector = null
+) {
+  // Finding relevant elements in the DOM
+  const slider = document.querySelector(sliderWrapperSelector);
+  const sliderCards = Array.from(slider.querySelectorAll(cardSelector));
+  const leftButton = document.querySelector(leftButtonSelector);
+  const rightButton = document.querySelector(rightButtonSelector);
+  const swipeArea = document.querySelector(swipeAreaSelector);
+  const sliderDots = Array.from(document.querySelectorAll(dotSelector));
 
-// Setting the X value of the slider and cards to 0.
-sliderCards.forEach((card) => {
-  card.style.transform = `translateX(0px)`;
-});
-slider.style.transform = `translateX(0px)`;
-
-// Declaring variables
-let cardWidth;
-let cardPosition;
-let sliderPosition;
-let isAnimating = false;
-
-// Find the width of a card (width + margin))
-function findCardWidth() {
-  //main width
-  let card = sliderCards[0];
-  let cardRect = card.getBoundingClientRect();
-
-  //margins
-  let cardStyle = window.getComputedStyle(sliderCards[0]);
-  let cardMarginRight = parseFloat(cardStyle.marginRight);
-  let cardMarginLeft = parseFloat(cardStyle.marginLeft);
-
-  //full width (width + margins)
-  cardWidth = cardRect.width + cardMarginRight + cardMarginLeft;
-}
-
-// Find current x position of a single card
-function findCardPosition(card) {
-  let cardTransformMatrix = window.getComputedStyle(card).getPropertyValue('transform');
-  let cardTransformValues = cardTransformMatrix.split(',');
-  cardPosition = parseFloat(cardTransformValues[4]);
-}
-
-// Find current x position of the slider
-function findSliderPosition() {
-  let sliderTransformMatrix = window.getComputedStyle(slider).getPropertyValue('transform');
-  let sliderTransformValues = sliderTransformMatrix.split(',');
-  sliderPosition = parseFloat(sliderTransformValues[4]);
-}
-
-// Function to tell us when the last slide has finished
-function finishedAnimating() {
-  isAnimating = false;
-}
-
-function moveLeft() {
-  findCardWidth(); // find width of a single card
+  // Setting the X value of the slider and cards to 0.
   sliderCards.forEach((card) => {
-    // update the current card positions
-    findCardPosition(card);
-    gsap.to(card, { duration: 0.5, x: cardPosition + cardWidth, ease: 'power2.easeOut' });
+    card.style.transform = `translateX(0px)`;
   });
-  setTimeout(function () {
-    findSliderPosition(); // find position of the slider
-    // move the first slider card to the back (so that the slider will loop infinitely)
-    slider.insertBefore(slider.lastElementChild, slider.firstElementChild);
-    // maintain the sliders position now that this card has been moved
-    gsap.to(slider, { duration: 0, x: sliderPosition - cardWidth });
-  }, 500);
-  setTimeout(finishedAnimating, 500);
-}
+  slider.style.transform = `translateX(0px)`;
 
-function moveRight() {
-  findCardWidth(); // find width of a single card
-  sliderCards.forEach((card) => {
-    // update the current card positions
-    findCardPosition(card);
-    gsap.to(card, { duration: 0.5, x: cardPosition - cardWidth, ease: 'power2.easeOut' });
-  });
-  setTimeout(function () {
-    findSliderPosition(); // find position of the slider
-    // move the last slider card to the front (so that the slider will loop infinitely)
-    slider.insertBefore(slider.firstElementChild, slider.lastElementChild.nextSibling);
-    // maintain the sliders position now that this card has been moved
-    gsap.to(slider, { duration: 0, x: sliderPosition + cardWidth });
-  }, 500);
-  setTimeout(finishedAnimating, 500);
-}
+  // Declaring variables
+  let cardWidth;
+  let cardPosition;
+  let sliderPosition;
+  let isAnimating = false;
 
-function leftButtonPressed() {
-  if (isAnimating === false) {
-    isAnimating = true;
-    moveLeft();
+  // Find the width of a card (width + margin))
+  function findCardWidth() {
+    //main width
+    let card = sliderCards[0];
+    let cardRect = card.getBoundingClientRect();
+
+    //margins
+    let cardStyle = window.getComputedStyle(sliderCards[0]);
+    let cardMarginRight = parseFloat(cardStyle.marginRight);
+    let cardMarginLeft = parseFloat(cardStyle.marginLeft);
+
+    //full width (width + margins)
+    cardWidth = cardRect.width + cardMarginRight + cardMarginLeft;
   }
-}
 
-function rightButtonPressed() {
-  if (isAnimating === false) {
-    isAnimating = true;
-    moveRight();
+  // Find current x position of a single card
+  function findCardPosition(card) {
+    let cardTransformMatrix = window.getComputedStyle(card).getPropertyValue('transform');
+    let cardTransformValues = cardTransformMatrix.split(',');
+    cardPosition = parseFloat(cardTransformValues[4]);
   }
-}
 
-// Finding the buttons in the DOM
-const leftButton = document.querySelector('[slider="left-button"]');
-const rightButton = document.querySelector('[slider="right-button"]');
+  // Find current x position of the slider
+  function findSliderPosition() {
+    let sliderTransformMatrix = window.getComputedStyle(slider).getPropertyValue('transform');
+    let sliderTransformValues = sliderTransformMatrix.split(',');
+    sliderPosition = parseFloat(sliderTransformValues[4]);
+  }
 
-// Applying click event listeners to the buttons only if they actually exist
-if (leftButton) {
-  leftButton.addEventListener('click', leftButtonPressed);
-}
-if (rightButton) {
-  rightButton.addEventListener('click', rightButtonPressed);
-}
+  // Function to tell us when the last slide has finished
+  function finishedAnimating() {
+    isAnimating = false;
+  }
 
-// Touch screen Swipe Support
+  function moveLeft() {
+    findCardWidth(); // find width of a single card
+    sliderCards.forEach((card) => {
+      // update the current card positions
+      findCardPosition(card);
+      gsap.to(card, { duration: 0.5, x: cardPosition + cardWidth, ease: 'power2.easeOut' });
+    });
+    setTimeout(function () {
+      findSliderPosition(); // find position of the slider
+      // move the first slider card to the back (so that the slider will loop infinitely)
+      slider.insertBefore(slider.lastElementChild, slider.firstElementChild);
+      // maintain the sliders position now that this card has been moved
+      gsap.to(slider, { duration: 0, x: sliderPosition - cardWidth });
+    }, 500);
+    dotNumberDecrease();
+    updateDots();
+    setTimeout(finishedAnimating, 500);
+  }
 
-function addSwipeInteraction(swipeArea) {
-  var startCoordinates = {};
-  var isSwiping = false; // Variable to track whether a swipe is in progress
+  function moveRight() {
+    findCardWidth(); // find width of a single card
+    sliderCards.forEach((card) => {
+      // update the current card positions
+      findCardPosition(card);
+      gsap.to(card, { duration: 0.5, x: cardPosition - cardWidth, ease: 'power2.easeOut' });
+    });
+    setTimeout(function () {
+      findSliderPosition(); // find position of the slider
+      // move the last slider card to the front (so that the slider will loop infinitely)
+      slider.insertBefore(slider.firstElementChild, slider.lastElementChild.nextSibling);
+      // maintain the sliders position now that this card has been moved
+      gsap.to(slider, { duration: 0, x: sliderPosition + cardWidth });
+    }, 500);
+    dotNumberIncrease();
+    updateDots();
+    setTimeout(finishedAnimating, 500);
+  }
 
-  swipeArea.addEventListener(
-    'touchstart',
-    function (event) {
+  function leftButtonPressed() {
+    if (isAnimating === false) {
+      isAnimating = true;
+      moveLeft();
+    }
+  }
+
+  function rightButtonPressed() {
+    if (isAnimating === false) {
+      isAnimating = true;
+      moveRight();
+    }
+  }
+
+  // Applying click event listeners to the buttons only if they actually exist
+  if (leftButton) {
+    leftButton.addEventListener('click', leftButtonPressed);
+  }
+  if (rightButton) {
+    rightButton.addEventListener('click', rightButtonPressed);
+  }
+
+  // Touch screen Swipe Support
+  function addSwipeInteraction(swipeArea) {
+    var startCoordinates = {};
+
+    swipeArea.addEventListener('touchstart', function (event) {
       startCoordinates.x = event.touches[0].clientX;
-      startCoordinates.y = event.touches[0].clientY;
-      isSwiping = false; // Initialize isSwiping to false
-    },
-    { passive: true }
-  ); // Mark the event listener as passive
+    });
 
-  swipeArea.addEventListener(
-    'touchmove',
-    function (event) {
-      var deltaX = event.touches[0].clientX - startCoordinates.x;
-      var deltaY = event.touches[0].clientY - startCoordinates.y;
+    swipeArea.addEventListener('touchend', function (event) {
+      var endX = event.changedTouches[0].clientX;
+      var deltaX = endX - startCoordinates.x;
 
-      // Check if the swipe is more horizontal than vertical
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        event.preventDefault(); // Prevent scrolling while swiping horizontally
-        isSwiping = true; // Set isSwiping to true when a horizontal swipe is detected
-      }
-    },
-    { passive: true }
-  ); // Mark the event listener as passive
-
-  swipeArea.addEventListener(
-    'touchend',
-    function (event) {
-      if (isSwiping) {
-        // Check if a horizontal swipe was detected
-        var deltaX = event.changedTouches[0].clientX - startCoordinates.x;
-
+      if (Math.abs(deltaX) > 50) {
+        // Adjust the threshold as needed
         if (deltaX > 0) {
           // Right swipe
           leftButtonPressed();
@@ -158,15 +146,67 @@ function addSwipeInteraction(swipeArea) {
           rightButtonPressed();
         }
       }
-    },
-    { passive: true }
-  ); // Mark the event listener as passive
+    });
+  }
+
+  addSwipeInteraction(swipeArea);
+
+  // Updating Slider Dots
+  let dotNumber = 1;
+
+  function dotNumberIncrease() {
+    dotNumber += 1;
+    if (dotNumber >= 5) {
+      dotNumber = 1;
+    }
+  }
+
+  function dotNumberDecrease() {
+    dotNumber -= 1;
+    if (dotNumber <= 0) {
+      dotNumber = 4;
+    }
+  }
+
+  function updateDots() {
+    sliderDots.forEach((dot, i) => {
+      if (i + 1 === dotNumber) {
+        dot.classList.add('is-selected');
+      } else {
+        dot.classList.remove('is-selected');
+      }
+    });
+  }
 }
 
-const swipeArea = document.querySelector('[slider="swipe-area"]');
-addSwipeInteraction(swipeArea);
+document.addEventListener('DOMContentLoaded', function () {
+  const slider1 = new Slider(
+    '[slider="wrapper"]',
+    '[slider="card"]',
+    '[slider="left-button"]',
+    '[slider="right-button"]',
+    '[slider="swipe-area"]',
+    null
+  );
 
-// make it work with multiple sliders.
+  const slider2 = new Slider(
+    '[slider2="wrapper"]',
+    '[slider2="card"]',
+    null,
+    null,
+    '[slider2="swipe-area"]',
+    '[slider2="dot"]'
+  );
+
+  const slider3 = new Slider(
+    '[slider3="wrapper"]',
+    '[slider3="card"]',
+    '[slider3="left-button"]',
+    '[slider3="right-button"]',
+    '[slider3="swipe-area"]',
+    null
+  );
+});
 
 //  ------------------------
 //   Categories Interaction

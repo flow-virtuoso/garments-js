@@ -157,7 +157,7 @@ function igPostsMoveRight() {
 }
 
 // Updating the IG slider's dots
-var dotNumber = 1;
+let dotNumber = 1;
 
 function dotNumberIncrease() {
   dotNumber += 1;
