@@ -8,7 +8,9 @@ function Slider(
   leftButtonSelector = null,
   rightButtonSelector = null,
   swipeAreaSelector = null,
-  dotSelector = null
+  dotSelector = null,
+  customEasing = 'power2.easeOut',
+  customDuration = 0.5
 ) {
   // Finding relevant elements in the DOM
   const slider = document.querySelector(sliderWrapperSelector);
@@ -29,6 +31,7 @@ function Slider(
   let cardPosition;
   let sliderPosition;
   let isAnimating = false;
+  let customDurationInSeconds = customDuration * 1000;
 
   // Find the width of a card (width + margin))
   function findCardWidth() {
@@ -69,7 +72,7 @@ function Slider(
     sliderCards.forEach((card) => {
       // update the current card positions
       findCardPosition(card);
-      gsap.to(card, { duration: 0.5, x: cardPosition + cardWidth, ease: 'power2.easeOut' });
+      gsap.to(card, { duration: customDuration, x: cardPosition + cardWidth, ease: customEasing });
     });
     setTimeout(function () {
       findSliderPosition(); // find position of the slider
@@ -77,10 +80,10 @@ function Slider(
       slider.insertBefore(slider.lastElementChild, slider.firstElementChild);
       // maintain the sliders position now that this card has been moved
       gsap.to(slider, { duration: 0, x: sliderPosition - cardWidth });
-    }, 500);
+    }, customDurationInSeconds);
     dotNumberDecrease();
     updateDots();
-    setTimeout(finishedAnimating, 500);
+    setTimeout(finishedAnimating, customDurationInSeconds);
   }
 
   function moveRight() {
@@ -88,7 +91,7 @@ function Slider(
     sliderCards.forEach((card) => {
       // update the current card positions
       findCardPosition(card);
-      gsap.to(card, { duration: 0.5, x: cardPosition - cardWidth, ease: 'power2.easeOut' });
+      gsap.to(card, { duration: customDuration, x: cardPosition - cardWidth, ease: customEasing });
     });
     setTimeout(function () {
       findSliderPosition(); // find position of the slider
@@ -96,10 +99,10 @@ function Slider(
       slider.insertBefore(slider.firstElementChild, slider.lastElementChild.nextSibling);
       // maintain the sliders position now that this card has been moved
       gsap.to(slider, { duration: 0, x: sliderPosition + cardWidth });
-    }, 500);
+    }, customDurationInSeconds);
     dotNumberIncrease();
     updateDots();
-    setTimeout(finishedAnimating, 500);
+    setTimeout(finishedAnimating, customDurationInSeconds);
   }
 
   function leftButtonPressed() {
@@ -195,7 +198,9 @@ document.addEventListener('DOMContentLoaded', function () {
     null,
     null,
     '[slider2="swipe-area"]',
-    '[slider2="dot"]'
+    '[slider2="dot"]',
+    'power1.out',
+    0.4
   );
 
   const slider3 = new Slider(
